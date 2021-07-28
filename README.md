@@ -105,3 +105,39 @@ and throw an exception and cry because you didn't init a lateinit var, and becau
 Keep in mind, the youTubePlayerView is an optional parameter I added in. You don't need to add it. The `this.lifecycle` is required though. 
 
 Because I wanted to pass in youTubePlayerView onto the observer, to allow the observer to use it. In this case, it is to call `youTubePlayerView.release()` onto it
+
+## Save vars during onSave
+
+You rotate your screen, oh no! Some numbers or text has disappeared off your screen! Goodness me, you comitted an unforgivable sin!
+
+Relax let's fix it. Whenever a screen is rotated, onCreate() is called once again, and everything is initialised from scratch. Ideally what you want to do is to save
+critical variables first, and when the screen is rotated, be able to retrieve them
+
+## 1. call onSave()
+
+override the  `onSaveInstanceState(outState: Bundle)` function and save within there any variables you might need later
+
+```
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+>>        outState.putFloat(KEY_CURRENT_SECONDS, tracker.currentSecond)
+        Timber.i("onSave called")
+    }
+```
+
+In this line, you are saving a key and value within outState. Keep your key as a final string. Oh wait, I mean val. Haha Kotlin remember folks.
+Secondly, pass in whatever primitive value you like. Or even an object. The world is yours
+
+## 2. retrieve savedInstanceState
+
+If you genuinely dared to commit the sin of rotating your screen, then retrieve the saved values from step 1 like so
+
+```
+        if (savedInstanceState != null) {
+            startSeconds = savedInstanceState.getFloat(KEY_CURRENT_SECONDS)
+        }
+```
+
+Now upon screen rotation (God forgive us) you will retrieve your desired value back once again
+
+
